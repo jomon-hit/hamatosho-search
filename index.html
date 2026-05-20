@@ -67,15 +67,34 @@ body {
 .icon-section { margin-bottom: 10px; }
 .icon-row { display: grid; gap: 8px; margin-bottom: 8px; }
 .icon-row.row4 { grid-template-columns: repeat(4, 1fr); }
-.icon-row.row3 { grid-template-columns: repeat(3, 1fr); }
-.icon-card {
+
+/* 対象年齢アイコン（大きめ） */
+.icon-row.row4 .icon-card {
   border-radius: 10px; overflow: hidden; cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
-.icon-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-.icon-card.active { outline: 3px solid #2a8a6a; }
-.icon-card img { width: 100%; display: block; }
+.icon-row.row4 .icon-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+.icon-row.row4 .icon-card.active { outline: 3px solid #2a8a6a; }
+.icon-row.row4 .icon-card img { width: 100%; display: block; }
+
+/* ジャンルアイコン（小さい横並びボタン） */
+.genre-row {
+  display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.genre-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px 6px 6px;
+  background: #fff; border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 2px solid transparent;
+}
+.genre-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.genre-btn.active { border-color: #2a8a6a; background: #f0faf5; }
+.genre-btn img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; display: block; }
+.genre-btn span { font-size: 13px; font-weight: 600; color: #333; }
 
 /* ===== 検索結果ヘッダー ===== */
 .result-header {
@@ -220,19 +239,19 @@ body {
       <div class="icon-card" data-filter-type="対象" data-filter-val="低学年から">
         <img src="icon/kids.png" alt="低学年から">
       </div>
-      <div class="icon-card" data-filter-type="対象" data-filter-val="幼児向け">
+      <div class="icon-card" data-filter-type="対象" data-filter-val="幼児">
         <img src="icon/babies.png" alt="幼児向け">
       </div>
     </div>
-    <div class="icon-row row3">
-      <div class="icon-card" data-filter-type="大分類" data-filter-val="メディア">
-        <img src="icon/media.png" alt="メディア">
+    <div class="genre-row">
+      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="メディア">
+        <img src="icon/media.png" alt="メディア"><span>メディア</span>
       </div>
-      <div class="icon-card" data-filter-type="大分類" data-filter-val="絵本">
-        <img src="icon/pictureBooks.png" alt="絵本">
+      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="絵本">
+        <img src="icon/pictureBooks.png" alt="絵本"><span>絵本</span>
       </div>
-      <div class="icon-card" data-filter-type="大分類" data-filter-val="図鑑・事典">
-        <img src="icon/illustratedBooks.png" alt="図鑑・事典">
+      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="図鑑">
+        <img src="icon/illustratedBooks.png" alt="図鑑・事典"><span>図鑑・事典</span>
       </div>
     </div>
   </div>

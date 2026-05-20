@@ -26,7 +26,7 @@ body {
   margin-bottom: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
-.brand-bar img { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+.brand-bar img { width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0; }
 .brand-info { flex: 1; }
 .brand-info .name { font-size: 14px; font-weight: 600; color: #222; }
 .brand-info .stats { font-size: 11px; color: #888; margin-top: 2px; }
@@ -49,8 +49,8 @@ body {
 .hero { position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .hero img { width: 100%; display: block; }
 .search-overlay {
-  position: absolute; left: 27%; top: 68%;
-  transform: translate(-50%, -50%); width: 44%;
+  position: absolute; left: 37%; top: 84%;
+  transform: translate(-50%, -50%); width: 42%;
 }
 .search-overlay input {
   width: 100%; padding: 9px 16px;
@@ -65,36 +65,19 @@ body {
 
 /* ===== アイコングリッド ===== */
 .icon-section { margin-bottom: 10px; }
-.icon-row { display: grid; gap: 8px; margin-bottom: 8px; }
-.icon-row.row4 { grid-template-columns: repeat(4, 1fr); }
-
-/* 対象年齢アイコン（大きめ） */
-.icon-row.row4 .icon-card {
+.icon-grid-all {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.icon-card {
   border-radius: 10px; overflow: hidden; cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
-.icon-row.row4 .icon-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-.icon-row.row4 .icon-card.active { outline: 3px solid #2a8a6a; }
-.icon-row.row4 .icon-card img { width: 100%; display: block; }
-
-/* ジャンルアイコン（小さい横並びボタン） */
-.genre-row {
-  display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
-}
-.genre-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 12px 6px 6px;
-  background: #fff; border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  transition: transform 0.15s, box-shadow 0.15s;
-  border: 2px solid transparent;
-}
-.genre-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-.genre-btn.active { border-color: #2a8a6a; background: #f0faf5; }
-.genre-btn img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; display: block; }
-.genre-btn span { font-size: 13px; font-weight: 600; color: #333; }
+.icon-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+.icon-card.active { outline: 3px solid #2a8a6a; }
+.icon-card img { width: 100%; display: block; }
 
 /* ===== 検索結果ヘッダー ===== */
 .result-header {
@@ -229,7 +212,7 @@ body {
 
   <!-- アイコングリッド -->
   <div class="icon-section">
-    <div class="icon-row row4">
+    <div class="icon-grid-all">
       <div class="icon-card" data-filter-type="対象" data-filter-val="一般向け">
         <img src="icon/adult.png" alt="一般向け">
       </div>
@@ -242,16 +225,14 @@ body {
       <div class="icon-card" data-filter-type="対象" data-filter-val="幼児">
         <img src="icon/babies.png" alt="幼児向け">
       </div>
-    </div>
-    <div class="genre-row">
-      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="メディア">
-        <img src="icon/media.png" alt="メディア"><span>メディア</span>
+      <div class="icon-card" data-filter-type="対象" data-filter-val="メディア">
+        <img src="icon/media.png" alt="メディア">
       </div>
-      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="絵本">
-        <img src="icon/pictureBooks.png" alt="絵本"><span>絵本</span>
+      <div class="icon-card" data-filter-type="対象" data-filter-val="絵本">
+        <img src="icon/pictureBooks.png" alt="絵本">
       </div>
-      <div class="genre-btn icon-card" data-filter-type="対象" data-filter-val="図鑑">
-        <img src="icon/illustratedBooks.png" alt="図鑑・事典"><span>図鑑・事典</span>
+      <div class="icon-card" data-filter-type="対象" data-filter-val="図鑑">
+        <img src="icon/illustratedBooks.png" alt="図鑑・事典">
       </div>
     </div>
   </div>

@@ -190,6 +190,15 @@ body {
   border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 12px;
 }
 .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.award-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  background: linear-gradient(135deg, #fff7d6, #ffe066);
+  color: #7a5800;
+  border: 1px solid #e6c200;
+  white-space: nowrap;
+}
 .tag-color {
   display: flex; align-items: center; gap: 5px;
   padding: 4px 10px 4px 6px;
@@ -309,9 +318,16 @@ body {
 <script>
 let allBooks = [];
 let filtered = [];
-let activeTarget = null;  // 対象年代フィルター
-let activeCat = null;     // Categoryフィルター
+let activeTarget = null;
+let activeCat = null;
 let keyword = '';
+let awardsData = {};  // 受賞データ
+
+// awards.json読み込み
+fetch('awards.json')
+  .then(r => r.json())
+  .then(data => { awardsData = data; })
+  .catch(() => { awardsData = {}; });
 
 const COLOR_MAP = {
   '紺':    { bg:'#dce8f7', color:'#0c447c', dot:'#185fa5' },
@@ -492,6 +508,17 @@ function openModal(b) {
     chip.className = 'tag-mono';
     chip.textContent = `シリーズ ${b['順番']}巻`;
     tagsEl.appendChild(chip);
+  }
+
+  // 受賞バッジ
+  const isbn = b['ISBN'] || '';
+  if (isbn && awardsData[isbn] && awardsData[isbn].length > 0) {
+    awardsData[isbn].forEach(award => {
+      const badge = document.createElement('div');
+      badge.className = 'award-badge';
+      badge.textContent = '🏆 ' + award;
+      tagsEl.appendChild(badge);
+    });
   }
 
   // ラベル情報

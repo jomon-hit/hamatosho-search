@@ -216,6 +216,21 @@ body {
 }
 .modal-label span { color: #333; font-weight: 500; }
 
+
+/* ===== ソートバー ===== */
+.sort-bar {
+  display: flex; align-items: center; gap: 5px;
+  flex-wrap: wrap; padding: 4px 0 6px;
+}
+.sort-label { font-size: 11px; color: #aaa; margin-right: 2px; white-space: nowrap; }
+.sort-btn {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  border: 1.5px solid #d0d0d0; background: #fff; color: #888;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.sort-btn:hover { border-color: #2a8a6a; color: #2a8a6a; }
+.sort-btn.active { background: #2a8a6a; border-color: #2a8a6a; color: #fff; }
 /* ===== ローディング ===== */
 .loading {
   text-align: center; padding: 40px;
@@ -282,6 +297,16 @@ body {
     <div class="cat-btn cat-zasshi" data-cat="雑誌">📰 雑誌</div>
   </div>
 
+  <!-- ソートバー -->
+  <div class="sort-bar">
+    <span class="sort-label">並び替え：</span>
+    <button class="sort-btn active" data-sort="reg_desc">🆕 登録日新しい順</button>
+    <button class="sort-btn" data-sort="reg_asc">📅 登録日古い順</button>
+    <button class="sort-btn" data-sort="author_asc">作者↑</button>
+    <button class="sort-btn" data-sort="author_desc">作者↓</button>
+    <button class="sort-btn" data-sort="title_asc">タイトル↑</button>
+  </div>
+
   <!-- フィルター状態バー -->
   <div class="filter-status">
     <span class="filter-count" id="result-count"></span>
@@ -323,6 +348,31 @@ let activeCat = null;
 let keyword = '';
 let awardsData = {};  // 受賞データ
 
+
+// ソート
+let currentSort = 'reg_desc';
+
+function applySort(books) {
+  const arr = [...books];
+  switch (currentSort) {
+    case 'reg_desc':   return arr.sort((a,b) => (b['登録日付']||'') > (a['登録日付']||'') ? 1 : -1);
+    case 'reg_asc':    return arr.sort((a,b) => (a['登録日付']||'') > (b['登録日付']||'') ? 1 : -1);
+    case 'author_asc': return arr.sort((a,b) => (a['著者読み']||a['著者']||'').localeCompare(b['著者読み']||b['著者']||'', 'ja'));
+    case 'author_desc':return arr.sort((a,b) => (b['著者読み']||b['著者']||'').localeCompare(a['著者読み']||a['著者']||'', 'ja'));
+    case 'title_asc':  return arr.sort((a,b) => (a['タイトル']||'').localeCompare(b['タイトル']||'', 'ja'));
+    default: return arr;
+  }
+}
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSort = btn.dataset.sort;
+    renderGrid(applySort(filtered).slice(0, 300));
+  });
+});
+
 // awards.json読み込み
 fetch('awards.json')
   .then(r => r.json())
@@ -346,7 +396,7 @@ fetch('books.json')
     allBooks = data;
     filtered = data;
     renderStats();
-    renderGrid(filtered.slice(0, 200));
+    renderGrid(applySort(filtered).slice(0, 200));
     updateResultHeader();
   });
 
@@ -405,7 +455,7 @@ function applyFilter() {
     const matchCat    = !activeCat    || b['大分類'] === activeCat;
     return matchKw && matchTarget && matchCat;
   });
-  renderGrid(filtered.slice(0, 300));
+  renderGrid(applySort(filtered).slice(0, 300));
   updateResultHeader();
 }
 
@@ -468,7 +518,7 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   document.querySelectorAll('.icon-card').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   filtered = allBooks;
-  renderGrid(filtered.slice(0, 200));
+  renderGrid(applySort(filtered).slice(0, 200));
   updateResultHeader();
 });
 

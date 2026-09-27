@@ -139,6 +139,15 @@ body {
   object-fit: cover; display: block;
   background: #e8e8e8;
 }
+.cover-placeholder {
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; box-sizing: border-box;
+  background: #eef0f2; color: #6b7280;
+  font-weight: 600; line-height: 1.5;
+  overflow: hidden; word-break: break-word;
+}
+.book-cover.cover-placeholder { font-size: 11px; padding: 8px 6px; }
+.modal-cover.cover-placeholder { font-size: 13px; padding: 10px; }
 .book-label {
   padding: 4px 6px;
   font-size: 10px; color: #555;
@@ -326,7 +335,8 @@ body {
     <button class="modal-close" id="modal-close">✕</button>
     <div class="modal-body">
       <div class="modal-header">
-        <img class="modal-cover" id="modal-cover" src="" alt="">
+        <img class="modal-cover" id="modal-cover" src="" alt="" onerror="modalCoverError()">
+        <div class="modal-cover cover-placeholder" id="modal-cover-placeholder" style="display:none"></div>
         <div class="modal-meta">
           <div class="modal-title" id="modal-title"></div>
           <div class="modal-author" id="modal-author"></div>
@@ -406,7 +416,7 @@ function renderStats() {
     `総蔵書数 ${allBooks.length.toLocaleString()}冊`;
   const counts = {};
   allBooks.forEach(b => {
-    const c = b['ラベルカラー'];
+    const c = b['ラベル色'];
     if (c && c !== '?') counts[c] = (counts[c] || 0) + 1;
   });
   const dotsEl = document.getElementById('color-dots');
@@ -421,6 +431,26 @@ function renderStats() {
   });
 }
 
+// 書影が無い本のための、文字だけのプレースホルダー表紙
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function placeholderStyle(colorName) {
+  const m = COLOR_MAP[colorName];
+  return m ? `background:${m.bg};color:${m.color}` : '';
+}
+// <img>の読み込み失敗時に、その場で文字プレースホルダーへ差し替える
+function coverFallback(img) {
+  const cls = img.classList.contains('modal-cover') ? 'modal-cover' : 'book-cover';
+  const div = document.createElement('div');
+  div.className = cls + ' cover-placeholder';
+  div.style.cssText = placeholderStyle(img.dataset.color || '');
+  div.textContent = img.dataset.title || '';
+  img.replaceWith(div);
+}
+
 // グリッド描画
 function renderGrid(books) {
   const grid = document.getElementById('books-grid');
@@ -432,11 +462,14 @@ function renderGrid(books) {
   books.forEach(b => {
     const card = document.createElement('div');
     card.className = 'book-card';
-    card.innerHTML = `
-      <img class="book-cover" src="${b['書影'] || ''}" 
-           alt="${b['タイトル']}" loading="lazy"
-           onerror="this.src='';this.style.background='#dde8f0'">
-      <div class="book-label">${b['タイトル']}</div>`;
+    const title = b['タイトル'] || '';
+    const colorName = b['ラベル色'] || '';
+    const coverHtml = b['書影']
+      ? `<img class="book-cover" src="${b['書影']}" alt="${escapeHtml(title)}" loading="lazy"
+           data-title="${escapeHtml(title)}" data-color="${escapeHtml(colorName)}"
+           onerror="coverFallback(this)">`
+      : `<div class="book-cover cover-placeholder" style="${placeholderStyle(colorName)}">${escapeHtml(title)}</div>`;
+    card.innerHTML = `${coverHtml}<div class="book-label">${escapeHtml(title)}</div>`;
     card.addEventListener('click', () => openModal(b));
     grid.appendChild(card);
   });
@@ -522,9 +555,35 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   updateResultHeader();
 });
 
+// モーダルの表紙画像読み込みに失敗した時（元のimg要素は残したまま、文字プレースホルダーへ切り替える）
+function modalCoverError() {
+  const modalImg = document.getElementById('modal-cover');
+  const modalPh  = document.getElementById('modal-cover-placeholder');
+  modalImg.style.display = 'none';
+  modalPh.style.display = 'flex';
+  modalPh.style.cssText = 'display:flex;' + placeholderStyle(modalImg.dataset.color || '');
+  modalPh.textContent = modalImg.dataset.title || '';
+}
+
 // モーダル
 function openModal(b) {
-  document.getElementById('modal-cover').src = b['書影'] || '';
+  const modalImg = document.getElementById('modal-cover');
+  const modalPh  = document.getElementById('modal-cover-placeholder');
+  const title    = b['タイトル'] || '';
+  const colorName = b['ラベル色'] || '';
+  if (b['書影']) {
+    modalImg.src = b['書影'];
+    modalImg.dataset.title = title;
+    modalImg.dataset.color = colorName;
+    modalImg.style.display = '';
+    modalPh.style.display = 'none';
+  } else {
+    modalImg.style.display = 'none';
+    modalImg.src = '';
+    modalPh.style.display = '';
+    modalPh.style.cssText = 'display:flex;' + placeholderStyle(colorName);
+    modalPh.textContent = title;
+  }
   document.getElementById('modal-title').textContent = b['タイトル'] || '';
   document.getElementById('modal-author').textContent = b['著者'] ? b['著者'].replace(/\|/g, ' / ') : '';
   document.getElementById('modal-publisher').textContent =
@@ -537,7 +596,6 @@ function openModal(b) {
   // タグ
   const tagsEl = document.getElementById('modal-tags');
   tagsEl.innerHTML = '';
-  const colorName = b['ラベルカラー'];
   const m = COLOR_MAP[colorName];
   if (m) {
     const chip = document.createElement('div');
